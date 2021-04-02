@@ -1,9 +1,15 @@
 // from data.js
+var form = d3.select("#form");
 var tableData = data;
 var tbody = d3.select("tbody");
 var button = d3.select("#filter-btn");
 var inputField = d3.select("#datetime");
 var oldInput = "";
+
+// Stop page from reloading on form submit
+form.on("submit", function(){
+    d3.event.preventDefault();
+});
 
 // Default Table function
 function tableDefault(){
@@ -70,6 +76,7 @@ inputField.on("keyup",function(){
         return false;
     }
 });
+
 
 
 
