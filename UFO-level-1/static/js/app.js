@@ -3,6 +3,7 @@ var tableData = data;
 var tbody = d3.select("tbody");
 var button = d3.select("#filter-btn");
 var inputField = d3.select("#datetime");
+var oldInput = "";
 
 // Default Table function
 function tableDefault(){
@@ -15,25 +16,9 @@ tableData.forEach(function(sighting){
     });
 };
 
-// Call default table with page load
-tableDefault();
-
-// Filter table function. If input blank while submitting load default table. 
-// If default table is already loaded
-function tableFilter(newInput){
-    console.log(`new: ${newInput}`)
-    console.log(`old: ${oldInput()}`)
-    if (newInput === "" && oldInput() === "1/13/2010"){
-        console.log("Default table already loaded")
-    }
-    else if (newInput === ""){
-        console.log("loaded default table");
-        tbody.html("");
-        tableDefault();
-    }
-    else if (oldInput() !== newInput){
-        tbody.html("");
-    dateFilter = tableData.filter(data => data.datetime == newInput);
+// Filter table based on user date input
+function tableUpdate(userDate){
+    dateFilter = tableData.filter(data => data.datetime === userDate);
     dateFilter.forEach(function(sighting){
         console.log(sighting);
         var row = tbody.append("tr");
@@ -42,31 +27,36 @@ function tableFilter(newInput){
             cell.text(value);
         });
     });
-    }   
-    else if (oldInput() === newInput){
-        console.log("Input submitted has not changed from last query")
-    };
 };
 
-// function that returns last date in the data table.
-// If the first date in the table matches the submitted input no need to render table again.
-function oldInput(){
-    var tdEmpty = d3.select("tr td").empty();
-    if (tdEmpty === false) {
-        var td = d3.select("tr:last-child td:first-child").node("innerhtml").textContent;
-        return td;
+// Load table based on input
+function tableLoad(inputDate){
+    console.log(`new: ${inputDate}`);
+    console.log(`old: ${oldInput}`);
+    if (!inputDate && oldInput){
+        console.log("loaded default table");
+        tbody.html("");
+        tableDefault();
     }
-    else {
-        return false;
+    else if (oldInput !== inputDate){
+        tbody.html("");
+        tableUpdate(inputDate);
+    }   
+    else if (oldInput === inputDate){
+        console.log("Input submitted has not changed from last query");
     };
+    oldInput = inputDate;
 };
 
 // Sends date from inputField to tableFilter function
 function clickHandle() {
     console.log("Button clicked");
     var newInput = inputField.property("value");
-    tableFilter(newInput);
+    tableLoad(newInput);
 };
+
+// Call default table with page load
+tableDefault();
 
 button.on("click", clickHandle);
 
